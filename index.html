@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOTORIOUS GT — Wear The Edge</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #060606;
+  --off-white: #F0EDE8;
+  --gold: #C9A84C;
+  --grey: #141414;
+  --grey2: #1e1e1e;
+  --mid: #2a2a2a;
+  --muted: #777;
+  --red: #e63946;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--off-white);font-family:'Inter',sans-serif;overflow-x:hidden;cursor:none;}
+
+/* CURSOR */
+#cur{width:8px;height:8px;background:var(--gold);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transition:width .2s,height .2s,background .2s;}
+#curR{width:32px;height:32px;border:1px solid rgba(201,168,76,.5);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;}
+body:has(a:hover) #cur,body:has(button:hover) #cur{width:14px;height:14px;background:#fff;}
+
+/* PAGES */
+.page{display:none;min-height:100vh;}
+.page.active{display:block;}
+
+/* ============ NAV ============ */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;transition:background .4s,padding .4s;padding:0;}
+nav.scrolled{background:rgba(6,6,6,.96);backdrop-filter:blur(16px);border-bottom:1px solid rgba(201,168,76,.12);}
+.nav-top{display:flex;align-items:center;justify-content:space-between;padding:22px 60px;}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:5px;color:var(--off-white);text-decoration:none;cursor:none;}
+.nav-logo span{color:var(--gold);}
+.nav-right{display:flex;align-items:center;gap:28px;}
+.nav-icon-btn{background:none;border:none;color:var(--off-white);font-size:16px;cursor:none;opacity:.75;transition:opacity .2s,color .2s;position:relative;display:flex;align-items:center;}
+.nav-icon-btn:hover{opacity:1;color:var(--gold);}
+.badge{position:absolute;top:-7px;right:-9px;background:var(--gold);color:var(--black);font-size:8px;font-weight:700;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+/* SUB NAV */
+.nav-sub{background:var(--grey);border-bottom:1px solid rgba(201,168,76,.1);display:flex;align-items:center;justify-content:center;gap:0;padding:0 60px;overflow-x:auto;}
+.nav-sub::-webkit-scrollbar{display:none;}
+.nav-sub-link{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:14px 22px;white-space:nowrap;cursor:none;transition:color .2s;border-bottom:2px solid transparent;display:block;}
+.nav-sub-link:hover,.nav-sub-link.active-cat{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* ============ HERO ============ */
+.hero{position:relative;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.38;}
+.hero-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.38;display:none;}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(6,6,6,.7) 0%,rgba(6,6,6,.1) 60%,rgba(6,6,6,.8) 100%);}
+.hero-content{position:relative;z-index:2;max-width:900px;padding:0 40px;}
+.hero-eyebrow{font-size:10px;letter-spacing:7px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;opacity:0;animation:fadeUp .7s ease .2s forwards;}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(72px,13vw,160px);line-height:.88;letter-spacing:1px;opacity:0;animation:fadeUp .8s ease .4s forwards;}
+.hero-title em{font-family:'Playfair Display',serif;font-style:italic;color:var(--gold);font-size:.52em;display:block;letter-spacing:5px;margin-top:6px;}
+.hero-desc{font-size:14px;color:rgba(240,237,232,.65);line-height:1.7;max-width:400px;margin-top:24px;opacity:0;animation:fadeUp .8s ease .6s forwards;}
+.hero-cta{margin-top:40px;display:flex;gap:14px;flex-wrap:wrap;opacity:0;animation:fadeUp .8s ease .8s forwards;}
+.btn-gold{background:var(--gold);color:var(--black);border:none;padding:15px 38px;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;cursor:none;transition:background .2s,transform .15s;text-decoration:none;display:inline-block;}
+.btn-gold:hover{background:#deba62;transform:translateY(-2px);}
+.btn-ghost{background:transparent;color:var(--off-white);border:1px solid rgba(240,237,232,.3);padding:15px 38px;font-size:10px;letter-spacing:3px;text-transform:uppercase;cursor:none;transition:all .2s;text-decoration:none;display:inline-block;}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px);}
+.hero-scroll-hint{position:absolute;bottom:36px;left:60px;display:flex;align-items:center;gap:12px;opacity:.4;}
+.scroll-line-h{width:50px;height:1px;background:var(--gold);}
+.hero-scroll-hint span{font-size:9px;letter-spacing:4px;text-transform:uppercase;}
+
+/* MARQUEE */
+.marquee-bar{padding:13px 0;background:var(--grey);border-top:1px solid rgba(201,168,76,.15);border-bottom:1px solid rgba(201,168,76,.15);overflow:hidden;}
+.marquee-inner{display:flex;gap:0;animation:marquee 22s linear infinite;white-space:nowrap;}
+.marquee-seg{font-size:11px;letter-spacing:5px;color:var(--muted);text-transform:uppercase;padding-right:60px;flex-shrink:0;}
+.marquee-seg b{color:var(--gold);}
+
+/* ============ SECTIONS ============ */
+.sec{padding:110px 60px;}
+.sec-label{font-size:9px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:block;}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,5.5vw,68px);line-height:1;letter-spacing:1px;}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:56px;flex-wrap:wrap;gap:20px;}
+
+/* COLLECTIONS CLICKABLE */
+.coll-grid{display:grid;grid-template-columns:1.8fr 1fr 1fr;grid-template-rows:300px 300px;gap:3px;}
+.coll-card{position:relative;overflow:hidden;cursor:none;}
+.coll-card:first-child{grid-row:span 2;}
+.coll-card img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.25,.46,.45,.94),filter .5s;}
+.coll-card:hover img{transform:scale(1.07);filter:brightness(1.1);}
+.coll-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,6,6,.88) 0%,rgba(6,6,6,.1) 55%);display:flex;flex-direction:column;justify-content:flex-end;padding:28px;}
+.coll-tag{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+.coll-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;}
+.coll-count{font-size:11px;color:var(--muted);margin-top:3px;}
+.coll-arrow{position:absolute;bottom:28px;right:24px;width:36px;height:36px;border:1px solid rgba(201,168,76,.4);display:flex;align-items:center;justify-content:center;font-size:14px;opacity:0;transition:opacity .3s,background .3s;}
+.coll-card:hover .coll-arrow{opacity:1;background:var(--gold);color:var(--black);border-color:var(--gold);}
+
+/* VIDEO BREAK */
+.vid-break{position:relative;height:75vh;overflow:hidden;}
+.vid-break video,.vid-break img{width:100%;height:100%;object-fit:cover;opacity:.42;}
+.vid-break-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,6,6,.5),rgba(6,6,6,.2),rgba(6,6,6,.6));display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px;}
+.vid-break-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8.5vw,105px);line-height:.9;margin-bottom:28px;}
+.vid-break-title em{font-family:'Playfair Display',serif;font-style:italic;color:var(--gold);font-size:.6em;display:block;letter-spacing:4px;}
+
+/* PRODUCTS */
+.prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
+.prod-card{background:var(--grey);cursor:none;position:relative;overflow:hidden;}
+.prod-img{position:relative;overflow:hidden;aspect-ratio:3/4;}
+.prod-img img{width:100%;height:100%;object-fit:cover;transition:transform .65s cubic-bezier(.25,.46,.45,.94);}
+.prod-card:hover .prod-img img{transform:scale(1.06);}
+.prod-badge{position:absolute;top:14px;left:14px;padding:4px 10px;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.badge-new{background:var(--gold);color:var(--black);}
+.badge-sale{background:var(--red);color:#fff;}
+.badge-ltd{background:transparent;border:1px solid var(--gold);color:var(--gold);}
+.prod-fav{position:absolute;top:14px;right:14px;background:rgba(6,6,6,.6);border:none;color:var(--off-white);width:34px;height:34px;border-radius:50%;cursor:none;font-size:14px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s,background .2s;}
+.prod-card:hover .prod-fav{opacity:1;}
+.prod-fav.liked{opacity:1;background:var(--red);color:#fff;}
+.prod-quick{position:absolute;bottom:0;left:0;right:0;background:var(--gold);color:var(--black);border:none;padding:13px;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:700;cursor:none;transform:translateY(100%);transition:transform .3s ease;}
+.prod-card:hover .prod-quick{transform:translateY(0);}
+.prod-info{padding:16px 18px 22px;}
+.prod-name{font-size:13px;font-weight:500;margin-bottom:5px;letter-spacing:.3px;}
+.prod-row{display:flex;align-items:center;justify-content:space-between;}
+.prod-price{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--gold);}
+.prod-old{font-size:11px;color:var(--muted);text-decoration:line-through;margin-left:6px;}
+.prod-dots{display:flex;gap:3px;margin-top:8px;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mid);}
+.dot.a{background:var(--gold);}
+
+/* HORIZONTAL SCROLL LOOKBOOK */
+.look-sec{padding:110px 0;background:var(--grey);}
+.look-head{padding:0 60px;margin-bottom:48px;}
+.look-strip{display:flex;gap:3px;overflow-x:auto;padding:0 60px 0;}
+.look-strip::-webkit-scrollbar{display:none;}
+.look-item{flex-shrink:0;width:290px;height:400px;position:relative;overflow:hidden;cursor:none;}
+.look-item img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease,filter .4s;filter:grayscale(25%);}
+.look-item:hover img{transform:scale(1.06);filter:grayscale(0%);}
+.look-label{position:absolute;bottom:20px;left:18px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;text-shadow:0 2px 10px rgba(0,0,0,.8);}
+.look-shop{position:absolute;bottom:20px;right:18px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:0;transition:opacity .3s;}
+.look-item:hover .look-shop{opacity:1;}
+
+/* SECOND VID */
+.vid2{position:relative;height:65vh;overflow:hidden;}
+.vid2 video,.vid2 img.vid2bg{width:100%;height:100%;object-fit:cover;opacity:.38;}
+.vid2-content{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:0 80px;background:linear-gradient(to right,rgba(6,6,6,.85) 0%,rgba(6,6,6,.1) 100%);}
+.vid2-text .sec-label{margin-bottom:12px;}
+.vid2-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5.5vw,70px);line-height:1;margin-bottom:20px;}
+.vid2-desc{font-size:13px;color:rgba(240,237,232,.6);line-height:1.8;max-width:380px;margin-bottom:32px;}
+
+/* STATS */
+.stats{background:var(--grey2);padding:70px 60px;border-top:1px solid rgba(201,168,76,.12);border-bottom:1px solid rgba(201,168,76,.12);}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;text-align:center;}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:60px;color:var(--gold);line-height:1;}
+.stat-l{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:6px;}
+
+/* TESTIMONIALS */
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:56px;}
+.test-card{background:var(--grey);padding:38px;position:relative;}
+.test-card::before{content:'"';font-family:'Playfair Display',serif;font-size:72px;color:var(--gold);opacity:.25;position:absolute;top:14px;left:28px;line-height:1;}
+.test-stars{color:var(--gold);font-size:11px;letter-spacing:2px;margin-bottom:16px;}
+.test-text{font-size:13px;line-height:1.85;color:rgba(240,237,232,.75);font-style:italic;margin-bottom:26px;padding-top:16px;}
+.test-auth{display:flex;align-items:center;gap:12px;}
+.test-ava{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);}
+.test-name{font-size:12px;font-weight:600;}
+.test-loc{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* FEATURES STRIP */
+.feat-strip{background:var(--grey);display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(255,255,255,.05);}
+.feat-item{padding:36px 30px;border-right:1px solid rgba(255,255,255,.05);display:flex;align-items:flex-start;gap:16px;}
+.feat-item:last-child{border-right:none;}
+.feat-icon{font-size:22px;margin-top:2px;}
+.feat-title{font-size:12px;font-weight:600;margin-bottom:4px;letter-spacing:.5px;}
+.feat-desc{font-size:11px;color:var(--muted);line-height:1.6;}
+
+/* INSTAGRAM GRID */
+.insta-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-top:0;}
+.insta-item{aspect-ratio:1;overflow:hidden;position:relative;cursor:none;}
+.insta-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s,filter .4s;filter:grayscale(20%);}
+.insta-item:hover img{transform:scale(1.08);filter:grayscale(0%);}
+.insta-overlay{position:absolute;inset:0;background:rgba(6,6,6,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;font-size:18px;}
+.insta-item:hover .insta-overlay{opacity:1;}
+
+/* NEWSLETTER */
+.nl{background:var(--black);text-align:center;padding:100px 60px;position:relative;overflow:hidden;}
+.nl::before{content:'GT';font-family:'Bebas Neue',sans-serif;font-size:380px;color:rgba(201,168,76,.03);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;line-height:1;}
+.nl-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5vw,58px);letter-spacing:2px;margin-bottom:10px;position:relative;}
+.nl-sub{font-size:13px;color:var(--muted);margin-bottom:38px;position:relative;}
+.nl-form{display:flex;max-width:460px;margin:0 auto;position:relative;}
+.nl-input{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.25);border-right:none;padding:15px 22px;color:var(--off-white);font-size:13px;outline:none;font-family:'Inter',sans-serif;}
+.nl-input::placeholder{color:var(--muted);}
+.nl-btn{background:var(--gold);color:var(--black);border:none;padding:15px 26px;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:700;cursor:none;transition:background .2s;}
+.nl-btn:hover{background:#deba62;}
+
+/* FOOTER */
+footer{background:#030303;padding:80px 60px 36px;border-top:1px solid rgba(201,168,76,.08);}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:60px;}
+.foot-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;margin-bottom:14px;}
+.foot-logo span{color:var(--gold);}
+.foot-p{font-size:12px;color:var(--muted);line-height:1.8;max-width:250px;}
+.foot-h{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:18px;}
+.foot-links{list-style:none;display:flex;flex-direction:column;gap:11px;}
+.foot-links a{color:var(--muted);text-decoration:none;font-size:13px;transition:color .2s;cursor:none;}
+.foot-links a:hover{color:var(--off-white);}
+.foot-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:28px;border-top:1px solid rgba(255,255,255,.05);flex-wrap:wrap;gap:14px;}
+.foot-copy{font-size:11px;color:var(--muted);}
+.foot-soc{display:flex;gap:22px;}
+.foot-soc a{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s;cursor:none;}
+.foot-soc a:hover{color:var(--gold);}
+
+/* ============ CART DRAWER ============ */
+.cart-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:800;opacity:0;pointer-events:none;transition:opacity .35s;}
+.cart-bg.open{opacity:1;pointer-events:all;}
+.cart-drawer{position:fixed;top:0;right:-440px;bottom:0;width:440px;background:#0c0c0c;z-index:801;transition:right .4s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;border-left:1px solid rgba(201,168,76,.12);}
+.cart-drawer.open{right:0;}
+.cart-hd{padding:26px 28px;border-bottom:1px solid rgba(201,168,76,.1);display:flex;align-items:center;justify-content:space-between;}
+.cart-hd-t{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;}
+.cart-x{background:none;border:none;color:var(--off-white);font-size:18px;cursor:none;opacity:.6;transition:opacity .2s;}
+.cart-x:hover{opacity:1;}
+.cart-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.cart-empty{text-align:center;padding:60px 0;color:var(--muted);font-size:13px;}
+.c-item{display:flex;gap:14px;margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid rgba(255,255,255,.05);}
+.c-item img{width:76px;height:96px;object-fit:cover;}
+.c-info{flex:1;}
+.c-name{font-size:13px;font-weight:500;margin-bottom:3px;}
+.c-size{font-size:10px;color:var(--muted);margin-bottom:10px;}
+.c-qty{display:flex;align-items:center;gap:10px;}
+.c-qb{background:var(--mid);border:none;color:var(--off-white);width:26px;height:26px;cursor:none;font-size:15px;transition:background .2s;display:flex;align-items:center;justify-content:center;}
+.c-qb:hover{background:var(--gold);color:var(--black);}
+.c-price{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--gold);margin-left:auto;}
+.cart-ft{padding:22px 28px;border-top:1px solid rgba(201,168,76,.1);}
+.cart-tot{display:flex;justify-content:space-between;margin-bottom:18px;}
+.cart-tot-l{font-size:10px;letter-spacing:3px;text-transform:uppercase;}
+.cart-tot-p{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);}
+.chk-btn{width:100%;background:var(--gold);color:var(--black);border:none;padding:17px;font-size:10px;letter-spacing:4px;text-transform:uppercase;font-weight:700;cursor:none;transition:background .2s;}
+.chk-btn:hover{background:#deba62;}
+
+/* ============ SIGNUP PAGE ============ */
+.signup-page{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+.signup-left{position:relative;overflow:hidden;}
+.signup-left img{width:100%;height:100%;object-fit:cover;filter:brightness(.55);}
+.signup-left-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:60px;}
+.signup-left-logo{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:5px;margin-bottom:auto;padding-top:0;}
+.signup-left-logo span{color:var(--gold);}
+.signup-left-quote{font-family:'Playfair Display',serif;font-style:italic;font-size:22px;line-height:1.5;color:var(--off-white);margin-bottom:12px;}
+.signup-left-sub{font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;}
+.signup-right{background:var(--grey);display:flex;align-items:center;justify-content:center;padding:60px 50px;}
+.signup-box{width:100%;max-width:400px;}
+.signup-tab-row{display:flex;margin-bottom:40px;border-bottom:1px solid rgba(255,255,255,.08);}
+.signup-tab{font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:12px 0;margin-right:32px;cursor:none;background:none;border:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s;}
+.signup-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.signup-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;margin-bottom:6px;}
+.signup-sub{font-size:12px;color:var(--muted);margin-bottom:34px;line-height:1.6;}
+.form-group{margin-bottom:18px;}
+.form-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:block;}
+.form-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);padding:14px 18px;color:var(--off-white);font-size:13px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s;}
+.form-input:focus{border-color:var(--gold);}
+.form-input::placeholder{color:var(--muted);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.signup-btn{width:100%;background:var(--gold);color:var(--black);border:none;padding:16px;font-size:10px;letter-spacing:4px;text-transform:uppercase;font-weight:700;cursor:none;transition:background .2s;margin-top:8px;}
+.signup-btn:hover{background:#deba62;}
+.or-divider{text-align:center;margin:22px 0;position:relative;}
+.or-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,.08);}
+.or-divider span{background:var(--grey);padding:0 16px;position:relative;font-size:10px;color:var(--muted);letter-spacing:2px;}
+.social-signin{display:flex;gap:10px;}
+.soc-btn{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--off-white);padding:12px;font-size:11px;cursor:none;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.soc-btn:hover{background:rgba(255,255,255,.1);}
+.terms{font-size:10px;color:var(--muted);text-align:center;margin-top:20px;line-height:1.6;}
+.terms a{color:var(--gold);text-decoration:none;cursor:none;}
+.signin-link{text-align:center;margin-top:16px;font-size:12px;color:var(--muted);}
+.signin-link a{color:var(--gold);text-decoration:none;cursor:none;}
+
+/* PRODUCT DETAIL PAGE */
+.pdp{padding:140px 60px 80px;}
+.pdp-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:start;}
+.pdp-imgs{display:grid;grid-template-columns:80px 1fr;gap:8px;}
+.pdp-thumbs{display:flex;flex-direction:column;gap:8px;}
+.pdp-thumb{width:80px;height:96px;object-fit:cover;cursor:none;opacity:.5;transition:opacity .2s;border:1px solid transparent;}
+.pdp-thumb.sel{opacity:1;border-color:var(--gold);}
+.pdp-main-img{aspect-ratio:3/4;overflow:hidden;}
+.pdp-main-img img{width:100%;height:100%;object-fit:cover;}
+.pdp-tag{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.pdp-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,4vw,52px);letter-spacing:1px;line-height:1;margin-bottom:14px;}
+.pdp-price{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--gold);margin-bottom:4px;}
+.pdp-old{font-size:14px;color:var(--muted);text-decoration:line-through;margin-left:8px;}
+.pdp-rev{font-size:11px;color:var(--muted);margin-bottom:26px;}
+.pdp-rev span{color:var(--gold);letter-spacing:1px;}
+.pdp-desc{font-size:13px;color:rgba(240,237,232,.65);line-height:1.85;margin-bottom:28px;}
+.size-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.size-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
+.size-btn{width:48px;height:48px;background:none;border:1px solid rgba(255,255,255,.15);color:var(--off-white);font-size:12px;cursor:none;transition:all .2s;}
+.size-btn:hover,.size-btn.sel{background:var(--gold);color:var(--black);border-color:var(--gold);}
+.pdp-actions{display:flex;gap:10px;margin-bottom:30px;}
+.pdp-add{flex:1;background:var(--gold);color:var(--black);border:none;padding:17px;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;cursor:none;transition:background .2s;}
+.pdp-add:hover{background:#deba62;}
+.pdp-wish{width:54px;background:none;border:1px solid rgba(255,255,255,.2);color:var(--off-white);font-size:18px;cursor:none;transition:all .2s;}
+.pdp-wish:hover{border-color:var(--red);color:var(--red);}
+.pdp-meta{border-top:1px solid rgba(255,255,255,.07);padding-top:24px;}
+.pdp-meta-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:12px;color:var(--muted);}
+.pdp-meta-icon{font-size:15px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gold);color:var(--black);padding:13px 28px;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;opacity:0;transition:all .3s;z-index:900;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* REVEAL */
+.rev{opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s ease;}
+.rev.in{opacity:1;transform:translateY(0);}
+.rev2{opacity:0;transform:translateY(36px);transition:opacity .7s ease .15s,transform .7s ease .15s;}
+.rev2.in{opacity:1;transform:translateY(0);}
+
+/* FILTERS */
+.filter-row{display:flex;gap:3px;}
+.ftab{background:none;border:1px solid var(--mid);color:var(--muted);padding:8px 18px;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:none;transition:all .2s;}
+.ftab:hover,.ftab.on{background:var(--gold);border-color:var(--gold);color:var(--black);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+@media(max-width:960px){
+  .nav-top{padding:18px 20px;}
+  .nav-sub{padding:0 20px;}
+  .sec{padding:70px 20px;}
+  .coll-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto;}
+  .coll-card:first-child{grid-column:span 2;grid-row:span 1;}
+  .prod-grid{grid-template-columns:repeat(2,1fr);}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .test-grid{grid-template-columns:1fr;}
+  .feat-strip{grid-template-columns:1fr 1fr;}
+  .insta-grid{grid-template-columns:repeat(3,1fr);}
+  .foot-grid{grid-template-columns:1fr 1fr;}
+  .signup-page{grid-template-columns:1fr;}
+  .signup-left{height:300px;}
+  .pdp-grid{grid-template-columns:1fr;}
+  .pdp-imgs{grid-template-columns:1fr;}
+  .pdp-thumbs{flex-direction:row;}
+  .pdp{padding:100px 20px 60px;}
+  .vid2-content{grid-template-columns:1fr;padding:0 30px;}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="curR"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-top">
+    <a class="nav-logo" href="#" onclick="showPage('home')">NOTORIOUS <span>GT</span></a>
+    <ul style="display:flex;gap:36px;list-style:none;align-items:center;" id="mainLinks">
+      <li><a href="#" onclick="showPage('home')" style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);text-decoration:none;cursor:none;transition:color .2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Home</a></li>
+      <li><a href="#" onclick="filterCat('all');showPage('home');scrollToShop()" style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);text-decoration:none;cursor:none;transition:color .2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Shop</a></li>
+      <li><a href="#" onclick="showPage('home');scrollToLook()" style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);text-decoration:none;cursor:none;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Lookbook</a></li>
+      <li><a href="#" onclick="showPage('signup')" style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);text-decoration:none;cursor:none;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Account</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-icon-btn" onclick="showPage('signup')" title="Account">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </button>
+      <button class="nav-icon-btn" onclick="toggleCart()" title="Cart">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="badge" id="cartBadge">0</span>
+      </button>
+    </div>
+  </div>
+  <div class="nav-sub">
+    <a href="#" class="nav-sub-link active-cat" onclick="filterCat('all');showPage('home');scrollToShop()">All</a>
+    <a href="#" class="nav-sub-link" onclick="filterCat('tops');showPage('home');scrollToShop()">Tops</a>
+    <a href="#" class="nav-sub-link" onclick="filterCat('bottoms');showPage('home');scrollToShop()">Bottoms</a>
+    <a href="#" class="nav-sub-link" onclick="filterCat('outerwear');showPage('home');scrollToShop()">Outerwear</a>
+    <a href="#" class="nav-sub-link" onclick="filterCat('acc');showPage('home');scrollToShop()">Accessories</a>
+    <a href="#" class="nav-sub-link" onclick="filterCat('ltd');showPage('home');scrollToShop()">Limited Edition</a>
+    <a href="#" class="nav-sub-link" onclick="filterCat('sale');showPage('home');scrollToShop()">Sale</a>
+  </div>
+</nav>
+
+<!-- ============ HOME PAGE ============ -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <!-- Working Pexels fashion video -->
+    <video class="hero-bg" autoplay muted loop playsinline preload="auto" id="heroVid">
+      <source src="https://videos.pexels.com/video-files/7690089/7690089-uhd_2560_1440_30fps.mp4" type="video/mp4">
+      <source src="https://videos.pexels.com/video-files/5779049/5779049-hd_1920_1080_25fps.mp4" type="video/mp4">
+    </video>
+    <!-- Fallback image if video fails -->
+    <img class="hero-bg-img" id="heroBgImg" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=85" alt="Hero" style="display:none;">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">New Season — SS 2026 Collection</p>
+      <h1 class="hero-title">NOTORIOUS<em>Golden Thread</em></h1>
+      <p class="hero-desc">Crafted for those who move through the world on their own terms. Wear the edge. Leave the mark.</p>
+      <div class="hero-cta">
+        <a href="#" class="btn-gold" onclick="scrollToShop()">Shop Now</a>
+        <a href="#" class="btn-ghost" onclick="scrollToLook()">View Lookbook</a>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <div class="scroll-line-h"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-bar">
+    <div class="marquee-inner">
+      <span class="marquee-seg">Free Shipping Over $150 <b>✦</b> New SS2026 Drop <b>✦</b> Notorious GT Originals <b>✦</b> Wear The Edge <b>✦</b> Limited Edition Pieces <b>✦</b> Worldwide Delivery <b>✦</b> Members Get Early Access <b>✦</b></span>
+      <span class="marquee-seg">Free Shipping Over $150 <b>✦</b> New SS2026 Drop <b>✦</b> Notorious GT Originals <b>✦</b> Wear The Edge <b>✦</b> Limited Edition Pieces <b>✦</b> Worldwide Delivery <b>✦</b> Members Get Early Access <b>✦</b></span>
+      <span class="marquee-seg">Free Shipping Over $150 <b>✦</b> New SS2026 Drop <b>✦</b> Notorious GT Originals <b>✦</b> Wear The Edge <b>✦</b> Limited Edition Pieces <b>✦</b> Worldwide Delivery <b>✦</b> Members Get Early Access <b>✦</b></span>
+    </div>
+  </div>
+
+  <!-- COLLECTIONS -->
+  <section class="sec" style="background:var(--black);">
+    <div class="sec-head rev">
+      <div><span class="sec-label">Curated for You</span><h2 class="sec-title">Shop by Collection</h2></div>
+      <a href="#" class="btn-ghost" onclick="scrollToShop()">View All</a>
+    </div>
+    <div class="coll-grid rev2">
+      <div class="coll-card" onclick="filterCat('all');scrollToShop()">
+        <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=900&q=85" alt="Dark Essentials">
+        <div class="coll-overlay"><div class="coll-tag">Featured Drop</div><div class="coll-name">Dark Essentials</div><div class="coll-count">34 Pieces</div></div>
+        <div class="coll-arrow">→</div>
+      </div>
+      <div class="coll-card" onclick="filterCat('tops');scrollToShop()">
+        <img src="https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=600&q=85" alt="Street Luxe">
+        <div class="coll-overlay"><div class="coll-tag">New In</div><div class="coll-name">Street Luxe</div><div class="coll-count">22 Pieces</div></div>
+        <div class="coll-arrow">→</div>
+      </div>
+      <div class="coll-card" onclick="filterCat('outerwear');scrollToShop()">
+        <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=85" alt="Raw Edge">
+        <div class="coll-overlay"><div class="coll-tag">Limited</div><div class="coll-name">Raw Edge</div><div class="coll-count">18 Pieces</div></div>
+        <div class="coll-arrow">→</div>
+      </div>
+      <div class="coll-card" onclick="filterCat('bottoms');scrollToShop()">
+        <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=600&q=85" alt="Void Series">
+        <div class="coll-overlay"><div class="coll-tag">Bestseller</div><div class="coll-name">Void Series</div><div class="coll-count">41 Pieces</div></div>
+        <div class="coll-arrow">→</div>
+      </div>
+      <div class="coll-card" onclick="filterCat('ltd');scrollToShop()">
+        <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=85" alt="Minimal Black">
+        <div class="coll-overlay"><div class="coll-tag">Exclusive</div><div class="coll-name">Minimal Black</div><div class="coll-count">12 Pieces</div></div>
+        <div class="coll-arrow">→</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEO BREAK 1 -->
+  <div class="vid-break">
+    <video autoplay muted loop playsinline preload="auto" id="vid1">
+      <source src="https://videos.pexels.com/video-files/5779049/5779049-hd_1920_1080_25fps.mp4" type="video/mp4">
+    </video>
+    <div class="vid-break-overlay">
+      <span class="sec-label">SS 2026 Campaign</span>
+      <h2 class="vid-break-title">Wear The<em>Infamous</em></h2>
+      <a href="#" class="btn-gold" onclick="scrollToShop()">Shop Campaign</a>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="feat-strip rev">
+    <div class="feat-item"><span class="feat-icon">🚀</span><div><div class="feat-title">Fast Delivery</div><div class="feat-desc">Ships within 48 hours. Express options available.</div></div></div>
+    <div class="feat-item"><span class="feat-icon">🔄</span><div><div class="feat-title">Free Returns</div><div class="feat-desc">30-day hassle-free return policy on all orders.</div></div></div>
+    <div class="feat-item"><span class="feat-icon">🔒</span><div><div class="feat-title">Secure Checkout</div><div class="feat-desc">256-bit SSL encryption on every transaction.</div></div></div>
+    <div class="feat-item"><span class="feat-icon">✦</span><div><div class="feat-title">Members Perks</div><div class="feat-desc">Early access, exclusive drops, loyalty rewards.</div></div></div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <section class="sec" style="background:var(--grey);" id="shopSection">
+    <div class="sec-head rev">
+      <div><span class="sec-label">The Wardrobe</span><h2 class="sec-title">New Arrivals</h2></div>
+      <div class="filter-row">
+        <button class="ftab on" onclick="filterCat('all',this)">All</button>
+        <button class="ftab" onclick="filterCat('tops',this)">Tops</button>
+        <button class="ftab" onclick="filterCat('bottoms',this)">Bottoms</button>
+        <button class="ftab" onclick="filterCat('outerwear',this)">Outerwear</button>
+      </div>
+    </div>
+    <div class="prod-grid" id="prodGrid"></div>
+  </section>
+
+  <!-- LOOKBOOK -->
+  <div class="look-sec" id="lookSection">
+    <div class="look-head rev">
+      <span class="sec-label">Editorial</span>
+      <h2 class="sec-title">The Lookbook</h2>
+    </div>
+    <div class="look-strip">
+      <div class="look-item" onclick="openLook(0)"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=500&q=85" alt="Look 01"><div class="look-label">Look 01</div><div class="look-shop">Shop →</div></div>
+      <div class="look-item" onclick="openLook(1)"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500&q=85" alt="Look 02"><div class="look-label">Look 02</div><div class="look-shop">Shop →</div></div>
+      <div class="look-item" onclick="openLook(2)"><img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=500&q=85" alt="Look 03"><div class="look-label">Look 03</div><div class="look-shop">Shop →</div></div>
+      <div class="look-item" onclick="openLook(3)"><img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=500&q=85" alt="Look 04"><div class="look-label">Look 04</div><div class="look-shop">Shop →</div></div>
+      <div class="look-item" onclick="openLook(4)"><img src="https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=500&q=85" alt="Look 05"><div class="look-label">Look 05</div><div class="look-shop">Shop →</div></div>
+      <div class="look-item" onclick="openLook(5)"><img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=500&q=85" alt="Look 06"><div class="look-label">Look 06</div><div class="look-shop">Shop →</div></div>
+      <div class="look-item" onclick="openLook(6)"><img src="https://images.unsplash.com/photo-1542295669297-4d352b042bca?w=500&q=85" alt="Look 07"><div class="look-label">Look 07</div><div class="look-shop">Shop →</div></div>
+    </div>
+  </div>
+
+  <!-- VIDEO BREAK 2 — SPLIT -->
+  <div class="vid2">
+    <video autoplay muted loop playsinline preload="auto">
+      <source src="https://videos.pexels.com/video-files/6011831/6011831-hd_1920_1080_30fps.mp4" type="video/mp4">
+    </video>
+    <div class="vid2-content">
+      <div class="vid2-text">
+        <span class="sec-label">The Brand Story</span>
+        <h2 class="vid2-title">Born From<br>The Streets</h2>
+        <p class="vid2-desc">Notorious GT was built in the margins — between luxury and rawness, between restraint and rebellion. Every piece carries that tension.</p>
+        <a href="#" class="btn-gold">Our Story</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats rev">
+    <div class="stats-grid">
+      <div><div class="stat-n" data-t="48000">0</div><div class="stat-l">Happy Customers</div></div>
+      <div><div class="stat-n" data-t="320">0</div><div class="stat-l">Unique Designs</div></div>
+      <div><div class="stat-n" data-t="92">0</div><div class="stat-l">Countries Shipped</div></div>
+      <div><div class="stat-n" data-t="5">0</div><div class="stat-l">Years of Edge</div></div>
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <section class="sec" style="background:var(--black);">
+    <div class="rev" style="text-align:center;"><span class="sec-label">Community</span><h2 class="sec-title">What They Say</h2></div>
+    <div class="test-grid rev2">
+      <div class="test-card"><div class="test-stars">★★★★★</div><p class="test-text">I've bought from Supreme, Off-White, everything — Notorious GT is on that same level but with its own identity. The stitching on the Void hoodie is insane quality.</p><div class="test-auth"><img class="test-ava" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt="Marcus"><div><div class="test-name">Marcus DeLeon</div><div class="test-loc">@marcusdln · New York</div></div></div></div>
+      <div class="test-card"><div class="test-stars">★★★★★</div><p class="test-text">I wore the Dark Essentials jacket to a runway show and three people asked where I got it. This brand is a secret weapon. Will not be sharing with everyone.</p><div class="test-auth"><img class="test-ava" src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=100&q=80" alt="Yara"><div><div class="test-name">Yara Okonkwo</div><div class="test-loc">@yara.styled · London</div></div></div></div>
+      <div class="test-card"><div class="test-stars">★★★★★</div><p class="test-text">Shipping was fast, packaging was premium, and the clothes actually fit like they're supposed to. The Raw Edge trousers are permanently in my rotation.</p><div class="test-auth"><img class="test-ava" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80" alt="Kenji"><div><div class="test-name">Kenji Watanabe</div><div class="test-loc">@kenjiwears · Tokyo</div></div></div></div>
+    </div>
+  </section>
+
+  <!-- INSTAGRAM -->
+  <section class="sec" style="background:var(--grey);padding-top:80px;padding-bottom:0;">
+    <div class="rev" style="text-align:center;margin-bottom:36px;"><span class="sec-label">@notoriousgt</span><h2 class="sec-title">Follow the Movement</h2></div>
+    <div class="insta-grid rev2">
+      <div class="insta-item"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" alt="ig1"><div class="insta-overlay">♡</div></div>
+      <div class="insta-item"><img src="https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=400&q=80" alt="ig2"><div class="insta-overlay">♡</div></div>
+      <div class="insta-item"><img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80" alt="ig3"><div class="insta-overlay">♡</div></div>
+      <div class="insta-item"><img src="https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=400&q=80" alt="ig4"><div class="insta-overlay">♡</div></div>
+      <div class="insta-item"><img src="https://images.unsplash.com/photo-1542295669297-4d352b042bca?w=400&q=80" alt="ig5"><div class="insta-overlay">♡</div></div>
+      <div class="insta-item"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80" alt="ig6"><div class="insta-overlay">♡</div></div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <div class="nl rev">
+    <h3 class="nl-title">JOIN THE MOVEMENT</h3>
+    <p class="nl-sub">Early access to drops. Member-only discounts. No noise.</p>
+    <div class="nl-form">
+      <input class="nl-input" type="email" placeholder="Your email address" id="nlEmail">
+      <button class="nl-btn" onclick="nlSub()">Join</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo">NOTORIOUS <span>GT</span></div>
+        <p class="foot-p">Crafted for those who move through the world on their own terms. Wear the edge. Leave the mark.</p>
+      </div>
+      <div><div class="foot-h">Shop</div><ul class="foot-links"><li><a href="#" onclick="scrollToShop()">New Arrivals</a></li><li><a href="#" onclick="filterCat('ltd');scrollToShop()">Limited Edition</a></li><li><a href="#" onclick="filterCat('outerwear');scrollToShop()">Outerwear</a></li><li><a href="#" onclick="filterCat('sale');scrollToShop()">Sale</a></li></ul></div>
+      <div><div class="foot-h">Help</div><ul class="foot-links"><li><a href="#">Size Guide</a></li><li><a href="#">Returns</a></li><li><a href="#">Shipping Info</a></li><li><a href="#">Track Order</a></li><li><a href="#">Contact Us</a></li></ul></div>
+      <div><div class="foot-h">Brand</div><ul class="foot-links"><li><a href="#">Our Story</a></li><li><a href="#" onclick="scrollToLook()">Lookbook</a></li><li><a href="#">Sustainability</a></li><li><a href="#">Careers</a></li></ul></div>
+    </div>
+    <div class="foot-bottom">
+      <p class="foot-copy">© 2026 Notorious GT. All rights reserved.</p>
+      <div class="foot-soc"><a href="#">Instagram</a><a href="#">TikTok</a><a href="#">Pinterest</a><a href="#">YouTube</a></div>
+    </div>
+  </footer>
+</div>
+
+<!-- ============ PRODUCT DETAIL PAGE ============ -->
+<div class="page" id="page-pdp">
+  <div class="pdp">
+    <div class="pdp-grid" id="pdpContent"></div>
+    <!-- RELATED -->
+    <div style="margin-top:80px;">
+      <div style="margin-bottom:36px;"><span class="sec-label">You May Also Like</span><h2 class="sec-title">Related Pieces</h2></div>
+      <div class="prod-grid" id="relatedGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SIGNUP PAGE ============ -->
+<div class="page" id="page-signup">
+  <div class="signup-page">
+    <div class="signup-left">
+      <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=85" alt="Fashion">
+      <div class="signup-left-content">
+        <div class="signup-left-logo">NOTORIOUS <span>GT</span></div>
+        <p class="signup-left-quote">"Style is a way to say who you are without having to speak."</p>
+        <span class="signup-left-sub">Join the Movement</span>
+      </div>
+    </div>
+    <div class="signup-right">
+      <div class="signup-box">
+        <div class="signup-tab-row">
+          <button class="signup-tab active" id="tabSignup" onclick="switchAuthTab('signup')">Create Account</button>
+          <button class="signup-tab" id="tabLogin" onclick="switchAuthTab('login')">Sign In</button>
+        </div>
+        <!-- SIGNUP FORM -->
+        <div id="formSignup">
+          <h2 class="signup-title">Create Account</h2>
+          <p class="signup-sub">Join Notorious GT for early drops, exclusive access and members-only perks.</p>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">First Name</label><input class="form-input" type="text" placeholder="Marcus"></div>
+            <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" type="text" placeholder="DeLeon"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" placeholder="you@example.com"></div>
+          <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="Min. 8 characters"></div>
+          <div class="form-group"><label class="form-label">Confirm Password</label><input class="form-input" type="password" placeholder="Repeat password"></div>
+          <button class="signup-btn" onclick="fakeSignup()">Create Account</button>
+          <div class="or-divider"><span>or continue with</span></div>
+          <div class="social-signin">
+            <button class="soc-btn" onclick="fakeSignup()">G Google</button>
+            <button class="soc-btn" onclick="fakeSignup()">𝕏 Twitter</button>
+          </div>
+          <p class="terms">By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+        </div>
+        <!-- LOGIN FORM -->
+        <div id="formLogin" style="display:none;">
+          <h2 class="signup-title">Welcome Back</h2>
+          <p class="signup-sub">Sign in to access your account, wishlist and order history.</p>
+          <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" placeholder="you@example.com"></div>
+          <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="Your password"></div>
+          <div style="text-align:right;margin-bottom:20px;"><a href="#" style="font-size:11px;color:var(--gold);text-decoration:none;cursor:none;">Forgot password?</a></div>
+          <button class="signup-btn" onclick="fakeLogin()">Sign In</button>
+          <div class="or-divider"><span>or continue with</span></div>
+          <div class="social-signin">
+            <button class="soc-btn" onclick="fakeLogin()">G Google</button>
+            <button class="soc-btn" onclick="fakeLogin()">𝕏 Twitter</button>
+          </div>
+          <p class="signin-link">Don't have an account? <a href="#" onclick="switchAuthTab('signup')">Create one</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-bg" id="cartBg" onclick="toggleCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-hd"><span class="cart-hd-t">YOUR BAG</span><button class="cart-x" onclick="toggleCart()">✕</button></div>
+  <div class="cart-body" id="cartBody"></div>
+  <div class="cart-ft">
+    <div class="cart-tot"><span class="cart-tot-l">Total</span><span class="cart-tot-p" id="cartTot">$0.00</span></div>
+    <button class="chk-btn" onclick="fakeCheckout()">Proceed to Checkout</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const products=[
+  {id:1,name:'Void Oversized Hoodie',price:148,old:185,cat:'tops',badge:'new',img:'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=85',imgs:['https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=85','https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=85','https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=85'],sizes:['XS','S','M','L','XL'],desc:'The Void Hoodie is cut from heavyweight 450gsm fleece with a brushed interior. Oversized silhouette, dropped shoulders, ribbed cuffs. A wardrobe anchor.'},
+  {id:2,name:'Shadow Cargo Trousers',price:189,old:null,cat:'bottoms',badge:'bestseller',img:'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&q=85',imgs:['https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&q=85','https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&q=85','https://images.unsplash.com/photo-1594938298603-c8148c4b4adc?w=600&q=85'],sizes:['28','30','32','34','36'],desc:'Six-pocket cargo silhouette in jet black ripstop. Tapered leg, adjustable ankle tabs. Built for movement, designed to stop traffic.'},
+  {id:3,name:'GT Leather Moto Jacket',price:420,old:520,cat:'outerwear',badge:'ltd',img:'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=85',imgs:['https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=85','https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=600&q=85','https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&q=85'],sizes:['S','M','L','XL'],desc:'Full-grain black leather with an asymmetric zip. Quilted lining, YKK hardware. Made in small batches. Only 50 units per season.'},
+  {id:4,name:'Noir Slim Fit Tee',price:68,old:null,cat:'tops',badge:null,img:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=85',imgs:['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=85','https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=85'],sizes:['XS','S','M','L','XL','XXL'],desc:'200gsm supima cotton. Pre-washed for a broken-in feel from day one. Clean chest fit, slightly elongated hem. The daily uniform.'},
+  {id:5,name:'Edge Washed Denim',price:210,old:260,cat:'bottoms',badge:'sale',img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&q=85',imgs:['https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&q=85','https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&q=85'],sizes:['28','30','32','34'],desc:'Selvedge denim from a Osaka mill. Acid-washed to a perfect grey. Raw hem finish. Slim through the thigh, tapered to the ankle.'},
+  {id:6,name:'Phantom Bomber Jacket',price:380,old:null,cat:'outerwear',badge:'new',img:'https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=600&q=85',imgs:['https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=600&q=85','https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=85'],sizes:['S','M','L','XL'],desc:'Matte nylon shell, ribbed collar and cuffs. Embroidered GT logo on the back. Padded but not puffy. The sleek winter weapon.'},
+  {id:7,name:'GT Structured Blazer',price:340,old:null,cat:'outerwear',badge:'exc',img:'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&q=85',imgs:['https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&q=85'],sizes:['S','M','L'],desc:'Unlined for a relaxed drape. Peak lapel, two-button closure, patch pockets. Wear it open over a hoodie. This is how you stand out.'},
+  {id:8,name:'Obsidian Wide Trousers',price:165,old:195,cat:'bottoms',badge:'sale',img:'https://images.unsplash.com/photo-1594938298603-c8148c4b4adc?w=600&q=85',imgs:['https://images.unsplash.com/photo-1594938298603-c8148c4b4adc?w=600&q=85'],sizes:['S','M','L','XL'],desc:'Fluid wide-leg cut in a viscose-linen blend. Mid-rise waist, pressed centre crease. Floor-grazing length. Effortlessly editorial.'},
+];
+
+let cart=JSON.parse(localStorage.getItem('ngt2_cart')||'[]');
+let likes=new Set(JSON.parse(localStorage.getItem('ngt2_likes')||'[]'));
+let curFilter='all';
+let curPdpId=null;
+
+// ===== PAGES =====
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ===== FILTER =====
+function filterCat(cat,btn){
+  curFilter=cat;
+  if(btn){
+    document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+  }
+  renderProducts();
+}
+
+function scrollToShop(){
+  showPage('home');
+  setTimeout(()=>{
+    const s=document.getElementById('shopSection');
+    if(s) s.scrollIntoView({behavior:'smooth'});
+  },80);
+}
+function scrollToLook(){
+  showPage('home');
+  setTimeout(()=>{
+    const s=document.getElementById('lookSection');
+    if(s) s.scrollIntoView({behavior:'smooth'});
+  },80);
+}
+
+// ===== PRODUCTS =====
+function renderProducts(){
+  const grid=document.getElementById('prodGrid');
+  const filtered=curFilter==='all'?products:products.filter(p=>p.cat===curFilter||p.badge===curFilter);
+  grid.innerHTML=filtered.map(p=>`
+    <div class="prod-card">
+      <div class="prod-img" onclick="openPdp(${p.id})">
+        <img src="${p.img}" alt="${p.name}" loading="lazy">
+        ${p.badge?`<div class="prod-badge badge-${p.badge==='new'?'new':p.badge==='sale'||p.badge==='bestseller'?'sale':'ltd'}">${p.badge.toUpperCase()}</div>`:''}
+        <button class="prod-fav ${likes.has(p.id)?'liked':''}" onclick="event.stopPropagation();toggleLike(${p.id},this)">♡</button>
+        <button class="prod-quick" onclick="event.stopPropagation();addToCart(${p.id})">+ Add to Bag</button>
+      </div>
+      <div class="prod-info" onclick="openPdp(${p.id})" style="cursor:none;">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-row">
+          <div><span class="prod-price">$${p.price}</span>${p.old?`<span class="prod-old">$${p.old}</span>`:''}</div>
+        </div>
+        <div class="prod-dots">${p.sizes.slice(0,4).map((_,i)=>`<div class="dot ${i<2?'a':''}"></div>`).join('')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openPdp(id){
+  const p=products.find(x=>x.id===id);
+  if(!p)return;
+  curPdpId=id;
+  const c=document.getElementById('pdpContent');
+  c.innerHTML=`
+    <div class="pdp-imgs">
+      <div class="pdp-thumbs">${p.imgs.map((img,i)=>`<img class="pdp-thumb ${i===0?'sel':''}" src="${img}" onclick="switchPdpImg(this,'${img}')" alt="view ${i+1}">`).join('')}</div>
+      <div class="pdp-main-img"><img src="${p.imgs[0]}" alt="${p.name}" id="pdpMainImg"></div>
+    </div>
+    <div class="pdp-info">
+      <div class="pdp-tag">${p.badge?p.badge.toUpperCase()+' —':''} Notorious GT</div>
+      <h1 class="pdp-name">${p.name}</h1>
+      <div><span class="pdp-price">$${p.price}</span>${p.old?`<span class="pdp-old">$${p.old}</span>`:''}</div>
+      <p class="pdp-rev">★★★★★ <span>4.9</span> · 127 reviews</p>
+      <p class="pdp-desc">${p.desc}</p>
+      <p class="size-label">Select Size</p>
+      <div class="size-grid">${p.sizes.map(s=>`<button class="size-btn" onclick="selectSize(this)">${s}</button>`).join('')}</div>
+      <div class="pdp-actions">
+        <button class="pdp-add" onclick="addToCart(${p.id});showToast('${p.name.replace(/'/g,"\\'")} added to bag')">Add to Bag</button>
+        <button class="pdp-wish" onclick="toggleLikeBtn(${p.id},this)">${likes.has(p.id)?'♥':'♡'}</button>
+      </div>
+      <div class="pdp-meta">
+        <div class="pdp-meta-row"><span class="pdp-meta-icon">🚀</span> Ships within 48 hours</div>
+        <div class="pdp-meta-row"><span class="pdp-meta-icon">🔄</span> Free returns within 30 days</div>
+        <div class="pdp-meta-row"><span class="pdp-meta-icon">📦</span> Premium packaging included</div>
+        <div class="pdp-meta-row"><span class="pdp-meta-icon">✦</span> Members earn loyalty points</div>
+      </div>
+    </div>
+  `;
+  const related=document.getElementById('relatedGrid');
+  const others=products.filter(x=>x.id!==id).slice(0,4);
+  related.innerHTML=others.map(p=>`
+    <div class="prod-card">
+      <div class="prod-img" onclick="openPdp(${p.id})">
+        <img src="${p.img}" alt="${p.name}" loading="lazy">
+        <button class="prod-quick" onclick="event.stopPropagation();addToCart(${p.id})">+ Add to Bag</button>
+      </div>
+      <div class="prod-info" onclick="openPdp(${p.id})" style="cursor:none;">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-row"><span class="prod-price">$${p.price}</span>${p.old?`<span class="prod-old">$${p.old}</span>`:''}</div>
+      </div>
+    </div>
+  `).join('');
+  showPage('pdp');
+}
+
+function switchPdpImg(el,src){
+  document.getElementById('pdpMainImg').src=src;
+  document.querySelectorAll('.pdp-thumb').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function selectSize(el){
+  document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ===== CART =====
+function addToCart(id){
+  const p=products.find(x=>x.id===id);
+  const ex=cart.find(i=>i.id===id);
+  if(ex)ex.qty++;else cart.push({...p,qty:1});
+  localStorage.setItem('ngt2_cart',JSON.stringify(cart));
+  updateCartUI();
+  showToast(p.name+' added to bag');
+}
+function changeQty(id,d){
+  const item=cart.find(i=>i.id===id);
+  if(!item)return;
+  item.qty+=d;
+  if(item.qty<=0)cart=cart.filter(i=>i.id!==id);
+  localStorage.setItem('ngt2_cart',JSON.stringify(cart));
+  updateCartUI();
+}
+function updateCartUI(){
+  const count=cart.reduce((a,i)=>a+i.qty,0);
+  document.getElementById('cartBadge').textContent=count;
+  const total=cart.reduce((a,i)=>a+i.price*i.qty,0);
+  document.getElementById('cartTot').textContent='$'+total.toFixed(2);
+  const body=document.getElementById('cartBody');
+  if(!cart.length){body.innerHTML='<div class="cart-empty">Your bag is empty.<br><br><a href="#" style="color:var(--gold);font-size:11px;letter-spacing:2px;cursor:none;" onclick="toggleCart();scrollToShop()">Continue Shopping →</a></div>';return;}
+  body.innerHTML=cart.map(item=>`
+    <div class="c-item">
+      <img src="${item.img}" alt="${item.name}">
+      <div class="c-info">
+        <div class="c-name">${item.name}</div>
+        <div class="c-size">Size: M · Black</div>
+        <div class="c-qty">
+          <button class="c-qb" onclick="changeQty(${item.id},-1)">−</button>
+          <span style="font-size:13px;">${item.qty}</span>
+          <button class="c-qb" onclick="changeQty(${item.id},1)">+</button>
+        </div>
+      </div>
+      <div class="c-price">$${(item.price*item.qty).toFixed(2)}</div>
+    </div>
+  `).join('');
+}
+function toggleCart(){
+  document.getElementById('cartDrawer').classList.toggle('open');
+  document.getElementById('cartBg').classList.toggle('open');
+}
+function fakeCheckout(){showToast('Redirecting to secure checkout...');}
+
+// ===== LIKES =====
+function toggleLike(id,btn){
+  if(likes.has(id)){likes.delete(id);btn.classList.remove('liked');btn.textContent='♡';}
+  else{likes.add(id);btn.classList.add('liked');btn.textContent='♥';showToast('Added to wishlist');}
+  localStorage.setItem('ngt2_likes',JSON.stringify([...likes]));
+}
+function toggleLikeBtn(id,btn){
+  if(likes.has(id)){likes.delete(id);btn.textContent='♡';}
+  else{likes.add(id);btn.textContent='♥';showToast('Added to wishlist');}
+  localStorage.setItem('ngt2_likes',JSON.stringify([...likes]));
+}
+
+// ===== AUTH =====
+function switchAuthTab(tab){
+  document.getElementById('tabSignup').classList.toggle('active',tab==='signup');
+  document.getElementById('tabLogin').classList.toggle('active',tab==='login');
+  document.getElementById('formSignup').style.display=tab==='signup'?'block':'none';
+  document.getElementById('formLogin').style.display=tab==='login'?'block':'none';
+}
+function fakeSignup(){showToast('Welcome to Notorious GT ✦');setTimeout(()=>showPage('home'),1200);}
+function fakeLogin(){showToast('Welcome back ✦');setTimeout(()=>showPage('home'),1200);}
+
+// ===== LOOKBOOK =====
+function openLook(i){filterCat('all');scrollToShop();}
+
+// ===== NEWSLETTER =====
+function nlSub(){
+  const v=document.getElementById('nlEmail').value;
+  if(!v){showToast('Please enter your email');return;}
+  showToast('Welcome to the movement ✦');
+  document.getElementById('nlEmail').value='';
+}
+
+// ===== TOAST =====
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ===== CURSOR =====
+const cur=document.getElementById('cur'),curR=document.getElementById('curR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.transform=`translate(${mx-4}px,${my-4}px)`;
+});
+(function animR(){
+  rx+=(mx-rx)*.1;ry+=(my-ry)*.1;
+  curR.style.transform=`translate(${rx-16}px,${ry-16}px)`;
+  requestAnimationFrame(animR);
+})();
+
+// ===== NAV SCROLL =====
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50);
+});
+
+// ===== REVEAL =====
+const ro=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');}});
+},{threshold:.1});
+document.querySelectorAll('.rev,.rev2').forEach(el=>ro.observe(el));
+
+// ===== COUNT UP =====
+const co=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const el=e.target,t=parseInt(el.dataset.t),d=1800,s=performance.now();
+      function u(n){
+        const p=Math.min((n-s)/d,1),ease=1-Math.pow(1-p,3);
+        el.textContent=Math.floor(ease*t).toLocaleString();
+        if(p<1)requestAnimationFrame(u);
+        else el.textContent=t>=1000?t.toLocaleString()+'+':t+'+';
+      }
+      requestAnimationFrame(u);
+      co.unobserve(el);
+    }
+  });
+},{threshold:.5});
+document.querySelectorAll('[data-t]').forEach(el=>co.observe(el));
+
+// ===== VIDEO FALLBACK =====
+const hv=document.getElementById('heroVid');
+if(hv){
+  hv.addEventListener('error',()=>{
+    hv.style.display='none';
+    document.getElementById('heroBgImg').style.display='block';
+  });
+  hv.addEventListener('loadeddata',()=>{hv.play().catch(()=>{
+    hv.style.display='none';
+    document.getElementById('heroBgImg').style.display='block';
+  });});
+}
+
+// ===== INIT =====
+renderProducts();
+updateCartUI();
+</script>
+</body>
+</html>
